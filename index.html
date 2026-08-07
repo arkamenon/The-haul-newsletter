@@ -1,179 +1,392 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The Haul | Weekly Freight Brief</title>
-  <style>
-    :root {
-      --bg: #f5efe6; --bg-light: #fdf9f3; --bg-mid: #ebe1d4;
-      --border-light: #d8cab6; --border-dark: #a88f79;
-      --brand: #8f3b35; --ink: #171412; --text-2: #5b4f46; --highlight: #fff7ef;
-      --shadow: 0 20px 48px rgba(20,13,9,0.08); --shadow-soft: 0 12px 30px rgba(20,13,9,0.05);
-      --r-xl: 28px; --r-lg: 20px; --r-md: 14px;
-      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, "Times New Roman", serif;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: var(--bg-light); color: var(--ink); }
-    body { font-family: var(--sans); line-height: 1.5; padding: 24px; min-height: 100vh; }
-    .page { width: min(1600px, 100%); margin: 0 auto; background: linear-gradient(180deg,#fdf8f1 0%,var(--bg) 100%);
-      border: 1px solid var(--border-light); border-radius: 30px; box-shadow: var(--shadow); padding: 26px 30px 30px; overflow: hidden; position: relative; }
-    .page::before { content:""; position:absolute; inset:0; background:
-      radial-gradient(circle at 100% 0%, rgba(143,59,53,0.08), transparent 28%),
-      radial-gradient(circle at 0% 100%, rgba(143,59,53,0.05), transparent 24%); pointer-events:none; }
-    .page > * { position: relative; z-index: 1; }
-    .topbar { display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:18px; border-bottom:1px solid var(--border-light); }
-    .kicker, .micro, .meta, .metric-label, .story-tag { font-family: var(--mono); font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color: var(--text-2); }
-    .toolbar { display:flex; gap:10px; flex-wrap:wrap; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; min-height:40px; padding:0 14px; border-radius:999px; border:1px solid var(--border-dark); background:var(--bg-light); color:var(--ink); font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; transition:transform .18s, border-color .18s, background .18s; }
-    .btn:hover, .btn:focus-visible { transform:translateY(-1px); border-color:var(--brand); background:#fffaf5; outline:none; }
-    .btn.primary { background:var(--ink); color:var(--highlight); border-color:var(--ink); }
-    .masthead { text-align:center; padding:18px 0 20px; border-bottom:1px solid var(--border-light); }
-    .masthead-top { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
-    h1 { margin:0; font-family:var(--serif); font-size:clamp(56px,7vw,90px); line-height:.92; letter-spacing:-0.05em; font-weight:700; }
-    .strapline { width:min(920px,100%); margin:12px auto 0; font-size:18px; color:var(--text-2); }
-    .market-panel { margin-top:22px; border-radius:var(--r-xl); border:1px solid rgba(143,59,53,0.45); background:#11100f; color:#fff7ef; padding:18px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 18px 38px rgba(17,16,15,0.18); }
-    .section-title { display:inline-flex; align-items:center; gap:10px; margin:0 0 12px; font-family:var(--mono); font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:var(--text-2); }
-    .market-panel .section-title { color:inherit; }
-    .section-title::after { content:""; width:48px; height:1px; background:var(--border-dark); }
-    .market-panel .section-title::after { background:rgba(208,113,104,0.45); }
-    .metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
-    .metric { border:1px solid rgba(208,113,104,0.18); border-radius:var(--r-md); background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(208,113,104,0.05)); padding:14px 14px 12px; }
-    .metric-label { font-size:11px; }
-    .metric-value { font-family:var(--serif); font-size:34px; line-height:1; margin:6px 0; letter-spacing:-0.03em; font-weight:700; }
-    .metric-change { font-size:14px; font-weight:700; }
-    .content { margin-top:24px; }
-    .lead { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr); gap:20px; padding-bottom:22px; border-bottom:1px solid var(--border-light); }
-    .meta { font-size:12px; margin-bottom:6px; }
-    .headline { margin:8px 0 12px; font-family:var(--serif); font-size:clamp(32px,4vw,50px); line-height:1.02; letter-spacing:-0.04em; font-weight:700; }
-    .headline a { color:inherit; text-decoration:none; border-bottom:1px solid transparent; }
-    .headline a:hover { color:var(--brand); border-color:var(--brand); }
-    .summary { margin:0; font-size:17px; color:var(--ink); max-width:74ch; }
-    .summary p { margin:0 0 0.95rem; } .summary p:last-child { margin-bottom:0; }
-    .lede-links { display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; }
-    .hero { min-height:340px; border-radius:var(--r-xl); overflow:hidden; border:1px solid var(--border-light); box-shadow:var(--shadow-soft); background:var(--bg-mid); }
-    .hero img { width:100%; height:100%; object-fit:cover; display:block; }
-    .top-title { margin:18px 0 14px; }
-    .stories { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:4px; }
-    .story-card { border:1px solid var(--border-light); border-radius:var(--r-lg); background:rgba(255,255,255,0.64); padding:16px; box-shadow:var(--shadow-soft); display:flex; flex-direction:column; gap:12px; }
-    .story-card h3 { margin:0; font-family:var(--serif); font-size:26px; line-height:1.08; letter-spacing:-0.03em; }
-    .story-card h3 a { color:inherit; text-decoration:none; }
-    .story-card h3 a:hover { color:var(--brand); }
-    .story-card p { margin:0; color:var(--text-2); font-size:15px; }
-    .story-summary-stack { display:grid; gap:10px; color:var(--text-2); font-size:15px; line-height:1.58; }
-    .story-summary-stack strong { color:var(--ink); }
-    .lane-breakdown { display:grid; gap:10px; }
-    .lane-item { padding-top:10px; border-top:1px solid var(--border-light); }
-    .lane-item:first-child { padding-top:0; border-top:none; }
-    .lane-item h4 { margin:0 0 4px; font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink); }
-    .lane-item p { font-size:14px; line-height:1.55; }
-    .story-thumb { min-height:150px; border-radius:var(--r-md); overflow:hidden; border:1px solid var(--border-light); background:var(--bg-mid); }
-    .story-thumb img { width:100%; height:100%; min-height:188px; object-fit:cover; display:block; }
-    .footer-note { margin-top:20px; padding-top:16px; border-top:1px solid var(--border-light); display:flex; justify-content:space-between; gap:14px; flex-wrap:wrap; color:var(--text-2); font-size:13px; }
-    @media (max-width:1180px) { .content,.lead,.stories,.metrics { grid-template-columns:1fr; } }
-    @media print {
-      @page { size: landscape; margin: 0.45in; }
-      body { padding:0; background:#fffaf5; }
-      .page { width:100%; box-shadow:none; border:none; border-radius:0; padding:0; background:#fffaf5; }
-      .toolbar { display:none; }
-      section, .story-card, .lead, .market-panel { break-inside: avoid; }
-      a { color:inherit; text-decoration:none; }
-      *, *::before, *::after { animation:none !important; transition:none !important; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Haul | Weekly Freight Brief</title>
+<style>
+:root {
+  --artifact-background: #faf9f6;
+  --artifact-background-light: #f3f1ea;
+  --artifact-background-mid: #ebe8df;
+  --artifact-border-light: #e2ddd2;
+  --artifact-border-dark: #cfc8b8;
+  --artifact-primary-brand: #20808d;
+  --artifact-primary-highlight: #121212;
+  --artifact-primary-hover: #1a6b75;
+  --artifact-selected: #e8f0ef;
+  --artifact-text-primary: #1a1a1a;
+  --artifact-text-secondary: #6b6557;
+  --artifact-text-highlight: #f6efe0;
+  --artifact-positive-background: #eef3ec;
+  --artifact-positive-text: #1a1a1a;
+  --artifact-positive: #3f7d4f;
+  --artifact-negative: #b23b2e;
+}
+html[data-theme='dark'] {
+  --artifact-background: #1a1916;
+  --artifact-background-light: #232119;
+  --artifact-background-mid: #2b281f;
+  --artifact-border-light: #3a3629;
+  --artifact-border-dark: #4a4636;
+  --artifact-primary-brand: #4db6c0;
+  --artifact-primary-highlight: #f5f2ea;
+  --artifact-primary-hover: #6fc6cf;
+  --artifact-selected: #24302f;
+  --artifact-text-primary: #f2efe6;
+  --artifact-text-secondary: #a89f8c;
+  --artifact-text-highlight: #332c1d;
+  --artifact-positive-background: #1f2b1e;
+  --artifact-positive-text: #d8ecd2;
+  --artifact-positive: #7cab84;
+  --artifact-negative: #d98a7e;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.7;
+  background-color: var(--artifact-background);
+  color: var(--artifact-text-primary);
+  margin: 0;
+  padding: 0;
+}
+.paper {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 40px 72px;
+}
+h1, h2, h3, .headline {
+  font-family: Georgia, "Times New Roman", Times, serif;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--artifact-text-primary);
+  margin: 0;
+}
+.eyebrow, .kicker, th, .rail-label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--artifact-text-secondary);
+}
+.meta {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  color: var(--artifact-text-secondary);
+}
+
+/* Edition strip */
+.edition-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--artifact-text-secondary);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--artifact-border-dark);
+}
+
+/* Masthead */
+.masthead {
+  text-align: center;
+  padding: 34px 0 26px;
+  border-bottom: 3px double var(--artifact-border-dark);
+}
+.masthead .title {
+  font-size: clamp(3.2rem, 11vw, 7rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+}
+.masthead .tagline {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--artifact-text-secondary);
+  margin-top: 16px;
+}
+
+/* Market Pulse */
+.section-title {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--artifact-text-secondary);
+  margin: 40px 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.section-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--artifact-border-dark);
+}
+.pulse {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--artifact-border-dark);
+  border-bottom: 1px solid var(--artifact-border-dark);
+}
+.pulse .tile {
+  padding: 22px 24px;
+  text-align: center;
+}
+.pulse .tile:not(:last-child) {
+  border-right: 1px solid var(--artifact-border-light);
+}
+.pulse .tile .label {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--artifact-text-secondary);
+}
+.pulse .tile .value {
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 8px 0 4px;
+}
+.pulse .tile .change {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--artifact-text-secondary);
+  min-height: 18px;
+}
+.pulse .tile .change.up { color: var(--artifact-positive); }
+.pulse .tile .change.down { color: var(--artifact-negative); }
+
+/* Lead story */
+.lead { padding: 44px 0 8px; }
+.lead .meta-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.tag {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--artifact-primary-brand);
+  border: 1px solid var(--artifact-primary-brand);
+  padding: 3px 9px;
+  border-radius: 2px;
+}
+.lead .headline {
+  font-size: clamp(2.1rem, 5vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: 22px;
+}
+.lead .headline a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.lead .headline a:hover { color: var(--artifact-primary-brand); }
+.lead .body {
+  max-width: 68ch;
+}
+.read-full {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--artifact-primary-brand);
+  text-decoration: none;
+  border-bottom: 1px solid var(--artifact-primary-brand);
+  padding-bottom: 2px;
+}
+.read-full:hover { color: var(--artifact-primary-hover); border-color: var(--artifact-primary-hover); }
+.lead .body p { margin: 0 0 18px; }
+.lead .body p:first-child::first-letter {
+  font-size: 3.6rem;
+  font-weight: 700;
+  float: left;
+  line-height: 0.8;
+  padding: 6px 10px 0 0;
+  color: var(--artifact-text-primary);
+}
+
+/* Top stories */
+.top-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 34px;
+  padding-top: 26px;
+  border-top: 1px solid var(--artifact-border-dark);
+}
+.story { }
+.story .tag { display: inline-block; margin-bottom: 12px; }
+.story h3 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 14px;
+}
+.story h3 a { color: inherit; text-decoration: none; transition: color 0.15s ease; }
+.story h3 a:hover { color: var(--artifact-primary-brand); }
+.story .read-full { margin-top: 2px; }
+.story p { font-size: 16px; line-height: 1.6; margin: 0 0 14px; }
+.story .breakdown { margin: 0; padding: 0; list-style: none; }
+.story .breakdown li {
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 10px 0;
+  border-top: 1px solid var(--artifact-border-light);
+}
+.story .breakdown li strong { display: block; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; letter-spacing: 0.04em; }
+
+/* Footer */
+.footer {
+  margin-top: 56px;
+  padding-top: 22px;
+  border-top: 3px double var(--artifact-border-dark);
+  text-align: center;
+}
+.footer .fine {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  color: var(--artifact-text-secondary);
+  letter-spacing: 0.04em;
+}
+.footer .brand {
+  font-size: 12px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--artifact-text-secondary);
+  margin-top: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+@media (max-width: 760px) {
+  .paper { padding: 32px 22px 56px; }
+  .pulse { grid-template-columns: 1fr; }
+  .pulse .tile:not(:last-child) { border-right: none; border-bottom: 1px solid var(--artifact-border-light); }
+  .top-grid { grid-template-columns: 1fr; gap: 8px; }
+  .story { padding: 22px 0; border-top: 1px solid var(--artifact-border-light); }
+}
+
+@media print {
+  body { margin: 0; padding: 0; background: #fff; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .paper { max-width: 100% !important; width: 100% !important; padding: 0.4in 0.6in; }
+  section, .masthead, .lead, .footer { break-inside: avoid; }
+  .top-grid { gap: 18px !important; }
+  .story { break-inside: avoid; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  button, [role="button"], .interactive-only { display: none !important; }
+}
+</style>
 </head>
 <body>
-  <main class="page" role="main" aria-label="The Haul newsletter">
-    <div class="topbar">
-      <div class="micro">Freight market visual brief &middot; weekly edition</div>
-      <div class="toolbar" aria-label="Newsletter actions">
-        <a class="btn primary" href="https://www.ccjdigital.com/economic-trends/article/15830010/trucking-rates-surge-35-industry-recovery-explained" target="_blank" rel="noopener noreferrer">Open lead article</a>
-        <button class="btn" type="button" onclick="window.print()">Export PDF</button>
+<div class="paper" data-glean-id="newsletter-root">
+
+  <div class="edition-strip" data-glean-id="edition-strip">
+    <span>Edition 02 &nbsp;&middot;&nbsp; SMB Sales Org &nbsp;&middot;&nbsp; Weekly Freight Brief</span>
+    <span>Aug 7, 2026</span>
+  </div>
+
+  <header class="masthead" data-glean-id="masthead">
+    <div class="title">The Haul</div>
+    <div class="tagline">The Weekly Dispatch of Trucking, Maritime, Supply Chain &amp; Freight News</div>
+  </header>
+
+  <section data-glean-id="market-pulse">
+    <div class="section-title">Market Pulse</div>
+    <div class="pulse">
+      <div class="tile" data-glean-id="pulse-spot-rate">
+        <div class="label">Spot Rate</div>
+        <div class="value">$2.60</div>
+        <div class="change up">+30% YoY</div>
+      </div>
+      <div class="tile" data-glean-id="pulse-tender-rejection">
+        <div class="label">Tender Rejection Index</div>
+        <div class="value">14%</div>
+        <div class="change"></div>
+      </div>
+      <div class="tile" data-glean-id="pulse-diesel">
+        <div class="label">Diesel</div>
+        <div class="value">$5.34</div>
+        <div class="change">flat MoM</div>
       </div>
     </div>
+  </section>
 
-    <header class="masthead">
-      <div class="masthead-top">
-        <div class="kicker">Edition 01 &middot; SMB Sales Org &middot; Weekly Freight Brief</div>
-        <div class="kicker">July 30, 2026</div>
-      </div>
-      <h1>The Haul</h1>
-      <p class="strapline">The Weekly Dispatch of Trucking, Maritime, Supply Chain &amp; Freight News</p>
-    </header>
+  <section class="lead" data-glean-id="lead-story">
+    <div class="meta-row">
+      <span class="tag">Lead Story</span>
+      <span class="meta">Freight &middot; 3 min read</span>
+    </div>
+    <h2 class="headline"><a href="https://www.freightwaves.com/news/fleet-demand-stays-strong-despite-july-slowdown-in-class-8-orders" target="_blank" rel="noopener">Fleet demand stays strong despite July slowdown in Class 8 orders</a></h2>
+    <div class="body">
+      <p>The 2026 Class 8 market is effectively sold out. July&rsquo;s 30% month-over-month drop in orders is strictly a supply issue&mdash;a lack of available production slots&mdash;not a drop in demand. If clients need equipment, they must pivot strategies to 2027 models, medium-duty, or the used market.</p>
+      <p>Despite the monthly dip, July orders (~22,000 units) were up roughly 70% year-over-year. Year-to-date orders are up 120%. With 2026 capacity maxed out, fleets are waiting on 2027 order books to open. Manufacturers are currently holding off due to uncertainty around upcoming EPA emissions regulations.</p>
+      <p>As new inventory stalls, the used market is absorbing the demand. Used Class 8 retail sales jumped 9.6% last month, driving average retail prices up to $61,751. Classes 5&ndash;7 are seeing massive growth, with July orders up 41% year-over-year (18,300 units), proving that overall freight fundamentals remain strong.</p>
+      <a class="read-full" href="https://www.freightwaves.com/news/fleet-demand-stays-strong-despite-july-slowdown-in-class-8-orders" target="_blank" rel="noopener">Read full article &rarr;</a>
+    </div>
+  </section>
 
-    <section class="market-panel" aria-label="Market Pulse">
-      <div class="section-title">Market Pulse</div>
-      <div class="metrics">
-        <article class="metric"><div class="metric-label">Spot Rate</div><div class="metric-value">$2.66</div><div class="metric-change" style="color:#fff7ef;">flat MoM</div></article>
-        <article class="metric"><div class="metric-label">Tender Rejection Index</div><div class="metric-value">16%</div><div class="metric-change" style="color:#7fb87a;">+60% YoY</div></article>
-        <article class="metric"><div class="metric-label">Diesel</div><div class="metric-value">$5.13</div><div class="metric-change" style="color:#fff7ef;">flat MoM</div></article>
-      </div>
-    </section>
+  <section data-glean-id="top-stories">
+    <div class="section-title">Top Stories</div>
+    <div class="top-grid">
 
-    <section class="content">
-      <section class="lead" aria-label="Lead story">
-        <article>
-          <div class="section-title">Lead Story</div>
-          <div class="meta">Freight &middot; 3 min read</div>
-          <h2 class="headline"><a href="https://www.ccjdigital.com/economic-trends/article/15830010/trucking-rates-surge-35-industry-recovery-explained" target="_blank" rel="noopener noreferrer">Shippers face tighter capacity as trucking rates hold near record highs</a></h2>
-          <div class="summary">
-            <p>According to ACT Research&#39;s June For-Hire Trucking Index, the truckload market has decisively shifted in favor of carriers, driven primarily by severe supply constraints rather than a broad surge in freight demand. Although the Freight Rate Index dipped slightly from May&#39;s record high down to 70.2, freight rates remain near historic peaks. This elevated pricing is heavily fueled by a continually shrinking driver pool, which has been exacerbated by strict new FMCSA regulations, driver school closures, and enhanced registration fraud enforcement.</p>
-            <p>At the same time, overall fleet capacity growth remains limited. Many carriers are currently holding off on new tractor purchases due to heavily depleted profit margins and the typical six-month lag it takes for spot-rate gains to translate into higher contract rates. However, looking ahead, ACT Research expects capacity expansion and fleet purchasing to accelerate in the third and fourth quarters as carriers begin to see improved contract margins and move to replace aging equipment ahead of the incoming EPA &#39;27 emissions standards.</p>
-          </div>
-          <div class="lede-links">
-            <a class="btn" href="https://www.ccjdigital.com/economic-trends/article/15830010/trucking-rates-surge-35-industry-recovery-explained" target="_blank" rel="noopener noreferrer">Read full article</a>
-          </div>
-        </article>
-        <figure class="hero" aria-label="Lead story hero image">
-          <img src="images/lead-hero.jpg" alt="Aerial view of a port container yard filled with rows of trucks and shipping containers" />
-        </figure>
-      </section>
+      <article class="story" data-glean-id="story-smb-shipping">
+        <span class="tag">Freight</span>
+        <h3><a href="https://www.freightwaves.com/news/small-business-shipping-costs" target="_blank" rel="noopener">The SMB shipping trap: Trying to go it alone</a></h3>
+        <p>Small and midsize business (SMB) clients are currently getting squeezed by rising shipping costs&mdash;from fluctuating fuel and tariffs to sudden carrier rate updates&mdash;without the dedicated logistics or compliance teams that enterprise shippers rely on. The single most expensive trap these SMBs fall into is trying to navigate this complex landscape in-house. Crucially, SMBs are not simply &ldquo;shrunken enterprises&rdquo;; enterprise tactics like stockpiling inventory to dodge tariffs tie up critical cash flow, while splitting volumes across regional carriers often backfires. While SMBs lack enterprise capital, their main competitive edge is speed and agility, meaning they need flexible, right-sized shipping strategies rather than generic enterprise playbooks.</p>
+        <a class="read-full" href="https://www.freightwaves.com/news/small-business-shipping-costs" target="_blank" rel="noopener">Read full article &rarr;</a>
+      </article>
 
-      <section aria-label="Top stories">
-        <div class="section-title top-title">Top Stories</div>
-        <div class="stories">
-          <article class="story-card">
-            <div class="story-tag">Freight</div>
-            <h3><a href="https://www.freightwaves.com/news/c-h-robinson-hit-with-huge-nuclear-verdict-in-a-post-montgomery-world" target="_blank" rel="noopener noreferrer">$604 Million &quot;Nuclear Verdict&quot; Rocks Freight Brokerage Sector</a></h3>
-            <div class="story-summary-stack">
-              <p>A Dallas County jury has delivered a $604 million judgment against freight brokerage giant C.H. Robinson and motor carrier Lupus Superior. The ruling stems from a fatal 2021 crash and highlights the severe, escalating legal vulnerabilities third-party logistics (3PL) providers face in today&#39;s legal climate.</p>
-              <p><strong>The Incident:</strong> In March 2021, a Lupus Superior truck driven by employee Gorgonio Gonzalez plowed into several vehicles in Jackson, Mississippi. The crash killed Gonzalez and three others, and injured several more.</p>
-              <p><strong>The Financial Burden:</strong> While the jury distributed the blame among three parties, legal experts expect C.H. Robinson to bear the brunt of the $604 million payout because the driver is deceased and the carrier lacks the assets to cover such a massive judgment.</p>
-            </div>
-            <div class="story-thumb"><img src="images/ch-robinson.jpg" alt="C.H. Robinson corporate headquarters signage" /></div>
-          </article>
-          <article class="story-card">
-            <div class="story-tag">Rates</div>
-            <h3>Week 30 spot rates cooled across van, reefer, and flatbed</h3>
-            <p>Post-holiday freight demand normalized and summer produce softened, pushing spot linehaul rates lower week over week even as all three equipment types remained sharply above last year.</p>
-            <div class="lane-breakdown">
-              <div class="lane-item"><h4>Dry Van</h4><p>Averaged $2.38 per mile in Week 30, down 2.5% ($0.06) from the prior week as post-July 4 demand normalized and capacity loosened. Rates ran 45.6% ($0.74) above the same week last year.</p></div>
-              <div class="lane-item"><h4>Reefer</h4><p>Averaged $2.72 per mile, down 2.9% ($0.08) week over week as summer produce volumes eased. Rates stood 39.6% ($0.77) higher than a year ago.</p></div>
-              <div class="lane-item"><h4>Flatbed</h4><p>Averaged $2.87 per mile, off 2.7% ($0.08) from the prior week amid softening industrial and construction demand. Rates climbed 40.6% ($0.83) year over year.</p></div>
-            </div>
-            <div class="story-thumb"><img src="images/dat-rates-week30.png" alt="DAT spot truckload rate trend charts for dry van, reefer, and flatbed through Week 30" /></div>
-          </article>
-          <article class="story-card">
-            <div class="story-tag">Housing</div>
-            <h3>High Rates, Low Freight: The Housing Market&#39;s Ongoing Drag on Trucking</h3>
-            <div class="story-summary-stack">
-              <p>The single-family housing market&mdash;a major driver of flatbed and dry van freight for materials like lumber, drywall, appliances, and moving services&mdash;remains stagnant with no near-term recovery in sight.</p>
-              <p><strong>Pending Home Sales:</strong> Sitting 32% below the 2017&ndash;2019 average and flatlining since Q4 2022, a critical forward-looking indicator showing no significant momentum.</p>
-              <p><strong>New Construction Permits:</strong> Hovering 2% above 2017&ndash;2019 baseline levels, but down about 9% from 2024 and drastically lower than the pandemic housing boom.</p>
-            </div>
-            <div class="story-thumb"><img src="images/lumber-flatbed.jpg" alt="Flatbed truck hauling stacks of lumber on a highway" /></div>
-          </article>
-        </div>
-      </section>
-    </section>
+      <article class="story" data-glean-id="story-spot-rates">
+        <span class="tag">Rates</span>
+        <h3>Capacity Pullback Keeps Freight Spot Rates Near Historical Highs</h3>
+        <p>Capacity is pulling back faster than freight volumes across the board. This dynamic is tightening load-to-truck ratios and driving up spot rates, causing them to invert (or nearly invert) their historical relationship with contract rates.</p>
+        <ul class="breakdown">
+          <li><strong>Dry Van</strong>Spot linehaul averaged $2.32 per mile, down 2.4%, or $0.06 per mile, week over week and up 42.1%, or $0.68 per mile, year over year, within the five-year range of $1.53 to $2.90.</li>
+          <li><strong>Reefer</strong>Spot linehaul averaged $2.65 per mile, down 2.6%, or $0.07 per mile, week over week and up 37.7%, or $0.73 per mile, year over year, within the five-year range of $1.82 to $3.33.</li>
+          <li><strong>Flatbed</strong>Spot linehaul averaged $2.83 per mile, down 1.5%, or $0.04 per mile, week over week and up 39.6%, or $0.81 per mile, year over year, within the five-year range of $1.83 to $3.01.</li>
+        </ul>
+      </article>
 
-    <footer class="footer-note">
-      <div>Built for weekly AE freight briefings inside Motive.</div>
-      <div>The Haul &middot; Weekly Freight Brief</div>
-    </footer>
-  </main>
+      <article class="story" data-glean-id="story-supply-chain-manufacturing">
+        <span class="tag">Supply Chain</span>
+        <h3><a href="https://www.truckingdive.com/news/us-manufacturing-expands-for-seventh-month-in-a-row-ism/826852/" target="_blank" rel="noopener">US manufacturing expands for seventh month in a row</a></h3>
+        <p>The U.S. manufacturing sector saw robust growth in July, expanding for the seventh consecutive month with a PMI of 55.6% (up 2.3 points from June). The overall U.S. economy also marked its 21st consecutive month of growth. While demand and production are surging, manufacturers are continuing to navigate pricing volatility and geopolitical supply chain risks.</p>
+        <p>The Production Index surged 6.3 points to 58.5%, hitting its highest level since November 2021. The New Orders Index also grew for the seventh straight month, reaching 56.7%.</p>
+        <p>The Employment Index returned to expansion territory for the first time in 33 months, climbing to 52.8% (up 3.1 points) as the sector added 3,000 jobs.</p>
+        <a class="read-full" href="https://www.truckingdive.com/news/us-manufacturing-expands-for-seventh-month-in-a-row-ism/826852/" target="_blank" rel="noopener">Read full article &rarr;</a>
+      </article>
+
+    </div>
+  </section>
+
+  <footer class="footer" data-glean-id="footer">
+    <div class="fine">Built for weekly AE freight briefings inside Motive.</div>
+    <div class="brand">The Haul &middot; Weekly Freight Brief</div>
+  </footer>
+
+</div>
 </body>
+</html>
 </html>
 
